@@ -2,15 +2,15 @@ import asyncio
 from config_data.config import load_config, Config
 from aiogram import Bot, Dispatcher
 from handlers import user_handlers, admin_handlers
-from aiogram.types import Message, BotCommand
-from aiogram.filters import Command, CommandStart
+from aiogram.fsm.storage.redis import RedisStorage, Redis
 
 
 async def main() -> None:
 
     config: Config = load_config('.env')
+    storage: RedisStorage = RedisStorage(redis=Redis())
     bot: Bot = Bot(config.tg_bot.token)
-    dp: Dispatcher = Dispatcher()
+    dp: Dispatcher = Dispatcher(storage=storage)
     dp.include_router(user_handlers.router)
     dp.include_router(admin_handlers.router)
 

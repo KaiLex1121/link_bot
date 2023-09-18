@@ -1,3 +1,6 @@
+from config_data.config import get_channel_link
+from services.redis_logic import get_from_redis
+
 class CommandsLexicon:
     start_and_help_command: str = 'Привет, этот бот помогает возрождать канал'
 
@@ -14,9 +17,10 @@ class UserKeyboardsLexicon:
 
 class AdminKeyboardsLexicon:
     administer_button: str = "Модерация бота"
+    cancel_editing_button: str = "Отменить редактирование"
 
 
-class MessagesLexicon:
+class UserMessagesLexicon:
     help_message: str = """ Чтобы отключить ограничения в телеграме на айфоне или андроиде, нужно:
 1. Перейти в веб-версию Телеграма: web.telegram.org.
 2. Зайти в настройки и авторизоваться по номеру телефона.
@@ -24,3 +28,10 @@ class MessagesLexicon:
 4. Найти блок "Материалы деликатного характера".
 5. Поставить галку "Выключить ограничения".
 """
+
+
+# class AdminMessagesLexicon:
+#     get_links_message: str = f"""
+# Ссылка на основной канал: {get_from_redis('main_link')}
+
+# Ссылка на порно канал: {get_from_redis('second_link')}"""

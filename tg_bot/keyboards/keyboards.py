@@ -15,7 +15,7 @@ class UserButtons:
 
 class AdminButtons:
     administer_button: KeyboardButton = KeyboardButton(text=AdminKeyboardsLexicon.administer_button)
-
+    cancel_editing_button: KeyboardButton = KeyboardButton(text=AdminKeyboardsLexicon.cancel_editing_button)
 
 class UserKeyboards:
     start_keyboard: ReplyKeyboardMarkup = ReplyKeyboardMarkup(keyboard=[[UserButtons.link_giving_button], [UserButtons.help_button]],
@@ -33,3 +33,6 @@ class UserKeyboards:
 class AdminKeyboards:
     admin_start_keyboard: ReplyKeyboardMarkup = ReplyKeyboardMarkup(keyboard=[[UserButtons.link_giving_button, UserButtons.help_button], [AdminButtons.administer_button]],
                                                                         resize_keyboard=True)
+    admin_cancel_editing_keyboard: ReplyKeyboardMarkup = ReplyKeyboardMarkup(keyboard=[[AdminButtons.cancel_editing_button]],
+                                                                        resize_keyboard=True,
+                                                                        is_persistent=True)

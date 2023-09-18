@@ -1,14 +1,17 @@
 from aiogram import Router
-from aiogram.filters import Command, Text, CommandStart
+from aiogram.filters import Command, Text, CommandStart, StateFilter
 from aiogram.types import Message
-from lexicon.lexicon import CommandsLexicon, MessagesLexicon
+from aiogram.fsm.state import default_state
+
+from lexicon.lexicon import CommandsLexicon, UserMessagesLexicon
 from keyboards.keyboards import UserKeyboards, AdminKeyboards
 from config_data.config import Config, load_config, get_channel_link
 from services import services
+from services.redis_logic import get_from_redis
+
 
 router: Router = Router()
-# cfg: Config = load_config('.env')
-# admins_ids: list[int] = cfg.tg_bot.admins_ids
+router.message.filter(StateFilter(default_state))
 
 
 @router.message(Command(commands=['help']))
@@ -31,8 +34,9 @@ async def get_link(message: Message):
 
 @router.message(Text(text='Ссылка на основной канал'))
 async def get_main_channel_link(message: Message):
-    await message.answer(text=f"{get_channel_link(channel='main')}",
-                         reply_markup=UserKeyboards.channel_chosing_keyboard)
+    await message.answer(text=await get_from_redis('main_link'),
+                         reply_markup=UserKeyboards.channel_chosing_keyboard,
+                         disable_web_page_preview=True)
 
 
 @router.message(Text(text='Помощь'))
@@ -43,20 +47,22 @@ async def get_help(message: Message):
 
 @router.message(Text(text='Как зайти на порно канал'))
 async def get_guide(message: Message):
-    await message.answer(text=MessagesLexicon.help_message,
+    await message.answer(text=UserMessagesLexicon.help_message,
                          reply_markup=UserKeyboards.help_keyboard)
 
 
 @router.message(Text(text='Связаться с админом'))
 async def message_to_admin(message: Message):
     await message.answer(text="Держи: https://t.me/BlackTheo",
-                         reply_markup=UserKeyboards.help_keyboard)
+                         reply_markup=UserKeyboards.help_keyboard,
+                         disable_web_page_preview=True)
 
 
 @router.message(Text(text='Ссылка на канал 18+'))
 async def get_second_channel_link(message: Message):
-    await message.answer(text=f'{get_channel_link()}',
-                         reply_markup=UserKeyboards.channel_chosing_keyboard)
+    await message.answer(text=await get_from_redis('second_link'),
+                         reply_markup=UserKeyboards.channel_chosing_keyboard,
+                         disable_web_page_preview=True)
 
 
 @router.message(Text(text='Назад'))
