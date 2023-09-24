@@ -10,7 +10,6 @@ from keyboards.keyboards import AdminKeyboards
 from filters import admin_filters, common_filters
 from services.services import get_redis
 from services.redis_logic import get_from_redis, add_to_redis
-# from lexicon.lexicon import AdminMessagesLexicon
 from states.admin_states import EditLinkState
 
 

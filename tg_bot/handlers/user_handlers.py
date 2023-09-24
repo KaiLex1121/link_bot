@@ -3,7 +3,7 @@ from aiogram.filters import Command, Text, CommandStart, StateFilter
 from aiogram.types import Message
 from aiogram.fsm.state import default_state
 
-from lexicon.lexicon import CommandsLexicon, UserMessagesLexicon
+from lexicon.ru_lexicon import CommandsLexicon, UserMessagesLexicon
 from keyboards.keyboards import UserKeyboards, AdminKeyboards
 from config_data.config import Config, load_config, get_channel_link
 from services import services
@@ -22,24 +22,31 @@ async def process_help_command(message: Message):
 
 @router.message(CommandStart())
 async def process_start_command(message: Message):
-    await message.answer(text="Выбери нужное",
+    await message.answer(text=UserMessagesLexicon.start_text,
                          reply_markup=services.get_start_keyboard_by_role(message=message))
 
 
-@router.message(Text(text='Получить ссылку'))
+@router.message(Text(text='Получить ссылку | Get a link'))
 async def get_link(message: Message):
-    await message.answer(text='Выбери канал',
+    await message.answer(text=UserMessagesLexicon.get_link,
                          reply_markup=UserKeyboards.channel_chosing_keyboard)
 
 
-@router.message(Text(text='Ссылка на основной канал'))
+@router.message(Text(text='Основа | Gore'))
 async def get_main_channel_link(message: Message):
     await message.answer(text=await get_from_redis('main_link'),
                          reply_markup=UserKeyboards.channel_chosing_keyboard,
                          disable_web_page_preview=True)
 
 
-@router.message(Text(text='Помощь'))
+@router.message(Text(text='18+ | Porn'))
+async def get_second_channel_link(message: Message):
+    await message.answer(text=await get_from_redis('second_link'),
+                         reply_markup=UserKeyboards.channel_chosing_keyboard,
+                         disable_web_page_preview=True)
+
+
+@router.message(Text(text='Помощь | Help'))
 async def get_help(message: Message):
     await message.answer(text="Какая помощь тебе нужна?",
                          reply_markup=UserKeyboards.help_keyboard)
@@ -58,14 +65,7 @@ async def message_to_admin(message: Message):
                          disable_web_page_preview=True)
 
 
-@router.message(Text(text='Ссылка на канал 18+'))
-async def get_second_channel_link(message: Message):
-    await message.answer(text=await get_from_redis('second_link'),
-                         reply_markup=UserKeyboards.channel_chosing_keyboard,
-                         disable_web_page_preview=True)
-
-
-@router.message(Text(text='Назад'))
+@router.message(Text(text='Назад | Back'))
 async def get_back(message: Message):
-    await message.answer(text="Выбери нужное",
+    await message.answer(text=UserMessagesLexicon.start_text,
                          reply_markup=services.get_start_keyboard_by_role(message=message))

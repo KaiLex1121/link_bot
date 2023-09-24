@@ -1,5 +1,5 @@
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
-from lexicon.lexicon import UserKeyboardsLexicon, AdminKeyboardsLexicon
+from lexicon.ru_lexicon import UserKeyboardsLexicon, AdminKeyboardsLexicon
 
 
 class InlineAdminButtons:

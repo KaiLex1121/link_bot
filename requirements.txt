@@ -1,4 +1,4 @@
-iofiles==23.1.0
+aiofiles==23.1.0
 aiogram==3.0.0b7
 aiohttp==3.8.4
 aioredis==2.0.1
