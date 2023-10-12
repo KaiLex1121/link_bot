@@ -1,6 +1,3 @@
-from config_data.config import get_channel_link
-from services.redis_logic import get_from_redis
-
 class CommandsLexicon:
     start_and_help_command: str = 'Привет, этот бот помогает возрождать канал'
 

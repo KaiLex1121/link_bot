@@ -8,12 +8,15 @@ from functools import lru_cache
 class TgBot:
     token: str
     admins_ids: list[int]
+    use_redis: bool
 
     @staticmethod
     def load_from_env(env: Env):
-        token: str = env.str("BOT_TOKEN")
-        admin_ids: list[int] = list(map(int, env.list("ADMIN_IDS")))
-        return TgBot(token=token, admins_ids=admin_ids)
+        token = env.str('BOT_TOKEN')
+        admin_ids = list(map(int, env.list('ADMIN_IDS')))
+        use_redis = env.bool('USE_REDIS')
+
+        return TgBot(token=token, admins_ids=admin_ids, use_redis=use_redis)
 
 
 @dataclass
@@ -26,10 +29,8 @@ class RedisConfig:
         """
         Constructs and returns a Redis DSN (Data Source Name) for this database configuration.
         """
-        if self.redis_pass:
-            return f"redis://:{self.redis_pass}@{self.redis_host}:{self.redis_port}/0"
-        else:
-            return f"redis://{self.redis_host}:{self.redis_port}/0"
+
+        return f"redis://{self.redis_host}:{self.redis_port}/1"
 
     @staticmethod
     def load_from_env(env: Env):
@@ -54,14 +55,6 @@ def _get_environment(path: str | None = None) -> Env:
     env.read_env(path=path)
 
     return env
-
-
-def get_channel_link(channel: str | None = None) -> str:
-    env: Env = _get_environment()
-
-    if channel == 'main':
-        return env('MAIN_CHANNEL_LINK')
-    return env('SECOND_CHANNEL_LINK')
 
 
 @lru_cache

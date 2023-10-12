@@ -5,7 +5,7 @@ from aiogram.fsm.state import default_state
 
 from lexicon.ru_lexicon import CommandsLexicon, UserMessagesLexicon
 from keyboards.keyboards import UserKeyboards, AdminKeyboards
-from config_data.config import Config, load_config, get_channel_link
+from config_data.config import Config, load_config
 from services import services
 from services.redis_logic import get_from_redis
 
