@@ -4,11 +4,26 @@ import logging
 from config_data.config import load_config, Config
 from aiogram import Bot, Dispatcher
 from handlers import user_handlers, admin_handlers
-from aiogram.fsm.storage.redis import RedisStorage, DefaultKeyBuilder
+from aiogram.fsm.storage.redis import RedisStorage, DefaultKeyBuilder, Redis
 from aiogram.fsm.storage.memory import MemoryStorage
 
+from middlewares.config import ConfigMiddleware
+from middlewares.redis import RedisMiddleware
 
-def get_storage(config: Config):
+
+def register_global_middlewares(dp: Dispatcher, config: Config, redis: Redis) -> None:
+
+    middleware_types = [
+        ConfigMiddleware(config),
+        RedisMiddleware(redis)
+    ]
+
+    for middleware_type in middleware_types:
+        dp.message.outer_middleware(middleware_type)
+        dp.callback_query.outer_middleware(middleware_type)
+
+
+def get_storage(config: Config) -> MemoryStorage | RedisStorage:
 
     if config.tg_bot.use_redis:
         storage = RedisStorage.from_url(
@@ -40,6 +55,9 @@ async def main() -> None:
 
     dp.include_router(user_handlers.router)
     dp.include_router(admin_handlers.router)
+
+    register_global_middlewares(dp=dp,config=config, redis=storage.redis)
+
 
     await bot.delete_webhook(drop_pending_updates=True)
     await dp.start_polling(bot)

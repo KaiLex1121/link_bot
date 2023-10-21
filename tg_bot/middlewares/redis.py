@@ -2,12 +2,13 @@ from typing import Callable, Dict, Any, Awaitable
 
 from aiogram import BaseMiddleware
 from aiogram.types import Message
+from aiogram.fsm.storage.redis import Redis
 
 
-class ConfigMiddleware(BaseMiddleware):
+class RedisMiddleware(BaseMiddleware):
 
-    def __init__(self, config) -> None:
-        self.config = config
+    def __init__(self, redis: Redis) -> None:
+        self.redis = redis
 
     async def __call__(
         self,
@@ -16,5 +17,5 @@ class ConfigMiddleware(BaseMiddleware):
         data: Dict[str, Any],
     ) -> Any:
 
-        data["config"] = self.config
+        data["redis"] = self.redis
         return await handler(event, data)

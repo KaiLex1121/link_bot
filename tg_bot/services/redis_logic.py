@@ -1,7 +1,7 @@
 from aiogram.fsm.storage.redis import Redis
 
 
-_redis: Redis = Redis(decode_responses=True)
+_redis = Redis(decode_responses=True)
 
 
 async def add_to_redis(key: str, value: str) -> str:

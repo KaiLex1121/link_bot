@@ -21,9 +21,9 @@ async def process_help_command(message: Message):
 
 
 @router.message(CommandStart())
-async def process_start_command(message: Message):
+async def process_start_command(message: Message, config):
     await message.answer(text=UserMessagesLexicon.start_text,
-                         reply_markup=services.get_start_keyboard_by_role(message=message))
+                         reply_markup=services.get_start_keyboard_by_role(message=message, config=config))
 
 
 @router.message(Text(text='Получить ссылку | Get a link'))
@@ -66,6 +66,6 @@ async def message_to_admin(message: Message):
 
 
 @router.message(Text(text='Назад | Back'))
-async def get_back(message: Message):
+async def get_back(message: Message, config):
     await message.answer(text=UserMessagesLexicon.start_text,
-                         reply_markup=services.get_start_keyboard_by_role(message=message))
+                         reply_markup=services.get_start_keyboard_by_role(message=message, config=config))

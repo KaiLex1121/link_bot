@@ -3,13 +3,12 @@ from aiogram.filters import Text, StateFilter, Command
 from aiogram.types import Message, CallbackQuery, ContentType
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import default_state
-from aiogram.fsm.storage.redis import RedisStorage, Redis
+from aiogram.fsm.storage.redis import Redis
 
 from keyboards.inline_keyboards import InlineAdminKeyboards
 from keyboards.keyboards import AdminKeyboards
 from filters import admin_filters, common_filters
-from services.services import get_redis
-from services.redis_logic import get_from_redis, add_to_redis
+from services.redis_logic import get_from_redis
 from states.admin_states import EditLinkState
 
 
