@@ -55,9 +55,7 @@ async def main() -> None:
 
     dp.include_router(user_handlers.router)
     dp.include_router(admin_handlers.router)
-
-    register_global_middlewares(dp=dp,config=config, redis=storage.redis)
-
+    register_global_middlewares(dp=dp, config=config, redis=storage.redis)
 
     await bot.delete_webhook(drop_pending_updates=True)
     await dp.start_polling(bot)

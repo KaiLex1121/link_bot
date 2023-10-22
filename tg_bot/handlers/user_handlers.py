@@ -2,12 +2,12 @@ from aiogram import Router
 from aiogram.filters import Command, Text, CommandStart, StateFilter
 from aiogram.types import Message
 from aiogram.fsm.state import default_state
+from aiogram.fsm.storage.redis import Redis
 
 from lexicon.ru_lexicon import CommandsLexicon, UserMessagesLexicon
 from keyboards.keyboards import UserKeyboards, AdminKeyboards
 from config_data.config import Config, load_config
 from services import services
-from services.redis_logic import get_from_redis
 
 
 router: Router = Router()
@@ -23,7 +23,9 @@ async def process_help_command(message: Message):
 @router.message(CommandStart())
 async def process_start_command(message: Message, config):
     await message.answer(text=UserMessagesLexicon.start_text,
-                         reply_markup=services.get_start_keyboard_by_role(message=message, config=config))
+                         reply_markup=services.get_start_keyboard_by_role(
+                            message=message,
+                            config=config))
 
 
 @router.message(Text(text='Получить ссылку | Get a link'))
@@ -33,15 +35,15 @@ async def get_link(message: Message):
 
 
 @router.message(Text(text='Основа | Gore'))
-async def get_main_channel_link(message: Message):
-    await message.answer(text=await get_from_redis('main_link'),
+async def get_main_channel_link(message: Message, redis: Redis):
+    await message.answer(text=(await redis.get('main_link')).decode('utf-8'),
                          reply_markup=UserKeyboards.channel_chosing_keyboard,
                          disable_web_page_preview=True)
 
 
 @router.message(Text(text='18+ | Porn'))
-async def get_second_channel_link(message: Message):
-    await message.answer(text=await get_from_redis('second_link'),
+async def get_second_channel_link(message: Message, redis: Redis):
+    await message.answer(text=(await redis.get('second_link')).decode('utf-8'),
                          reply_markup=UserKeyboards.channel_chosing_keyboard,
                          disable_web_page_preview=True)
 
@@ -68,4 +70,6 @@ async def message_to_admin(message: Message):
 @router.message(Text(text='Назад | Back'))
 async def get_back(message: Message, config):
     await message.answer(text=UserMessagesLexicon.start_text,
-                         reply_markup=services.get_start_keyboard_by_role(message=message, config=config))
+                         reply_markup=services.get_start_keyboard_by_role(
+                            message=message,
+                            config=config))
