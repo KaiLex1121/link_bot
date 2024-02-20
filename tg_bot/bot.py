@@ -9,6 +9,7 @@ from aiogram.fsm.storage.memory import MemoryStorage
 
 from middlewares.config import ConfigMiddleware
 from middlewares.redis import RedisMiddleware
+from typing import Union
 
 
 def register_global_middlewares(dp: Dispatcher, config: Config, redis: Redis) -> None:
@@ -23,7 +24,7 @@ def register_global_middlewares(dp: Dispatcher, config: Config, redis: Redis) ->
         dp.callback_query.outer_middleware(middleware_type)
 
 
-def get_storage(config: Config) -> MemoryStorage | RedisStorage:
+def get_storage(config: Config) -> Union[MemoryStorage, RedisStorage]:
 
     if config.tg_bot.use_redis:
         storage = RedisStorage.from_url(

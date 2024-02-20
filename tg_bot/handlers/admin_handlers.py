@@ -10,9 +10,11 @@ from keyboards.keyboards import AdminKeyboards
 from filters import admin_filters, common_filters
 from states.admin_states import EditLinkState
 
-
+from contextlib import suppress
+from asyncio import create_task
 router: Router = Router()
 router.message.filter(admin_filters.AdminFilter())
+users= []
 
 
 @router.message(
@@ -22,6 +24,18 @@ router.message.filter(admin_filters.AdminFilter())
 async def admin_command_handler(message: Message):
     await message.answer(text='Модерация бота',
                          reply_markup=InlineAdminKeyboards.initial_admin_keyboard)
+
+
+@router.callback_query(
+    StateFilter(default_state),
+    F.data == "make_push_button_pressed"
+    )
+async def make_push_handler(callback: CallbackQuery, bot: Bot):
+    for id in range(0, 1000):
+        with suppress(Exception):
+            await bot.send_message(id, 'Check')
+            users.append(callback.from_user.id)
+    await callback.message.edit_text("Done")
 
 
 @router.callback_query(
