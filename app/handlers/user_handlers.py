@@ -8,6 +8,7 @@ from lexicon.ru_lexicon import CommandsLexicon, UserMessagesLexicon
 from keyboards.keyboards import UserKeyboards, AdminKeyboards
 from app.config.main_config import Config, load_config
 from services import services
+from dao.holder import HolderDAO
 
 
 router: Router = Router()
@@ -19,6 +20,16 @@ async def process_help_command(message: Message):
     await message.answer(text=CommandsLexicon.start_and_help_command,
                          reply_markup=UserKeyboards.start_keyboard)
 
+
+@router.message(Command(commands=['add_user']))
+async def add_user(message: Message, dao: HolderDAO):
+    user = message.from_user
+
+    added_user = await dao.user.save_user(user)
+
+    await dao.user.commit()
+
+    await message.answer(text=f'Пользователь {added_user} добавлен')
 
 @router.message(CommandStart())
 async def process_start_command(message: Message, config):

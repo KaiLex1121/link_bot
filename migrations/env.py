@@ -15,7 +15,7 @@ config = context.config
 
 config.set_main_option(
     "sqlalchemy.url",
-    "postgresql+asyncpg://user:password@host:port/db_name"
+    "postgresql+asyncpg://user:password@localhost:5432/db_name"
 )
 
 # Interpret the config file for Python logging.

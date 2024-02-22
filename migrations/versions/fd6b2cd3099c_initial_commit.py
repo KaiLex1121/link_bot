@@ -1,8 +1,8 @@
-"""First commit
+"""Initial commit
 
-Revision ID: 8db3181ce596
+Revision ID: fd6b2cd3099c
 Revises: 
-Create Date: 2024-02-22 21:24:19.782532
+Create Date: 2024-02-23 00:57:23.548516
 
 """
 from typing import Sequence, Union
@@ -12,7 +12,7 @@ import sqlalchemy as sa
 from sqlalchemy.dialects import postgresql
 
 # revision identifiers, used by Alembic.
-revision: str = '8db3181ce596'
+revision: str = 'fd6b2cd3099c'
 down_revision: Union[str, None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -23,7 +23,7 @@ def upgrade() -> None:
     op.create_table('chats',
     sa.Column('id', sa.BigInteger(), nullable=False),
     sa.Column('tg_id', sa.BigInteger(), nullable=False),
-    sa.Column('type', sa.Enum('private', 'channel', 'group', 'supergroup', name='chattype'), nullable=False),
+    sa.Column('type', sa.Enum('private', 'channel', 'group', 'supergroup', name='typeofchat'), nullable=False),
     sa.Column('title', sa.String(), nullable=False),
     sa.Column('username', sa.String(), nullable=True),
     sa.Column('created_at', postgresql.TIMESTAMP(), server_default=sa.text('now()'), nullable=False),

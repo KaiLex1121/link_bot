@@ -1,5 +1,5 @@
 from aiogram import Router, F, Dispatcher, Bot
-from aiogram.filters import Text, StateFilter
+from aiogram.filters import Text, StateFilter, Command
 from aiogram.types import Message, CallbackQuery, ContentType
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import default_state
@@ -11,6 +11,7 @@ from filters import admin_filters, common_filters
 from states.admin_states import EditLinkState
 
 from contextlib import suppress
+from app.dao.holder import HolderDAO
 
 
 router: Router = Router()
@@ -20,7 +21,7 @@ router.message.filter(admin_filters.AdminFilter())
 @router.message(
     StateFilter(default_state),
     Text(text="Модерация бота")
-    )
+)
 async def admin_command_handler(message: Message):
     await message.answer(text='Модерация бота',
                          reply_markup=InlineAdminKeyboards.initial_admin_keyboard)

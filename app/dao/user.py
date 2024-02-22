@@ -5,6 +5,7 @@ from sqlalchemy.future import select
 from app.dao.base import BaseDAO
 from app.models.database import User
 from app.models import dto
+from aiogram import types
 
 
 class UserDAO(BaseDAO[User]):
@@ -17,20 +18,26 @@ class UserDAO(BaseDAO[User]):
     #     )
     #     return result.scalar_one()
 
-    # async def upsert_user(self, user: dto.User) -> dto.User:
-    #     kwargs = dict(
-    #         tg_id=user.tg_id,
-    #         first_name=user.first_name,
-    #         last_name=user.last_name,
-    #         username=user.username,
-    #         is_bot=user.is_bot,
-    #     )
-    #     saved_user = await self.session.execute(
-    #         insert(User)
-    #         .values(**kwargs)
-    #         .on_conflict_do_update(
-    #             index_elements=(User.tg_id,), set_=kwargs, where=User.tg_id == user.tg_id
-    #         )
-    #         .returning(User)
-    #     )
-    #     return saved_user.scalar_one().to_dto()
+    async def save_user(self, user: types.User) -> User:
+        kwargs = dict(
+            tg_id=user.id,
+            first_name=user.first_name,
+            last_name=user.last_name,
+            username=user.username,
+            is_bot=user.is_bot,
+        )
+
+        print(kwargs)
+
+        saved_user = await self.session.execute(
+            insert(User)
+            .values(**kwargs)
+            .on_conflict_do_update(
+                index_elements=(User.tg_id,),
+                set_=kwargs,
+                where=User.tg_id == user.id
+            )
+            .returning(User)
+        )
+
+        return saved_user.scalar_one()

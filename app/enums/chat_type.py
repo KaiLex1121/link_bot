@@ -1,7 +1,7 @@
 import enum
 
 
-class ChatType(enum.Enum):
+class TypeOfChat(enum.Enum):
     private = enum.auto()
     channel = enum.auto()
     group = enum.auto()
