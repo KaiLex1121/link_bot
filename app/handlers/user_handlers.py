@@ -6,7 +6,7 @@ from aiogram.fsm.storage.redis import Redis
 
 from lexicon.ru_lexicon import CommandsLexicon, UserMessagesLexicon
 from keyboards.keyboards import UserKeyboards, AdminKeyboards
-from config_data.config import Config, load_config
+from app.config.main_config import Config, load_config
 from services import services
 
 

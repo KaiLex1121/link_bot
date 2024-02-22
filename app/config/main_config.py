@@ -20,6 +20,37 @@ class TgBot:
 
 
 @dataclass
+class DbConfig:
+    password: str
+    user: str
+    database: str
+    host: str = 'localhost'
+    port: int = 5432
+
+    def create_uri(self, driver="asyncpg", host:str=None, port:int=None) -> str:
+        if not host:
+            host = self.host
+        if not port:
+            port = self.port
+
+        uri = f"postgresql+{driver}://{self.user}:{self.password}@{self.host}:{self.port}/{self.database}"
+
+        return uri
+
+    @staticmethod
+    def load_from_env(env: Env):
+        host = env.str("DB_HOST")
+        password = env.str("POSTGRES_PASSWORD")
+        user = env.str("POSTGRES_USER")
+        database = env.str("POSTGRES_DB")
+        port = env.int("DB_PORT", 5432)
+
+        return DbConfig(
+            host=host, password=password, user=user, database=database, port=port
+        )
+
+
+@dataclass
 class RedisConfig:
     redis_pass: Optional[str]
     redis_port: Optional[int]
@@ -46,6 +77,7 @@ class RedisConfig:
 @dataclass
 class Config:
     tg_bot: TgBot
+    db: Optional[DbConfig]
     redis: Optional[RedisConfig] = None
 
 
@@ -63,7 +95,8 @@ def load_config(path: str | None) -> Config:
 
     config = Config(
         tg_bot=TgBot.load_from_env(env),
-        redis=RedisConfig.load_from_env(env)
-        )
+        redis=RedisConfig.load_from_env(env),
+        db=DbConfig.load_from_env(env)
+    )
 
     return config

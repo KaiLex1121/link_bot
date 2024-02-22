@@ -1,27 +1,31 @@
 import asyncio
 import logging
 
-from config_data.config import load_config, Config
+from app.config.main_config import load_config, Config
 from aiogram import Bot, Dispatcher
 from handlers import user_handlers, admin_handlers
 from aiogram.fsm.storage.redis import RedisStorage, DefaultKeyBuilder, Redis
 from aiogram.fsm.storage.memory import MemoryStorage
 
+
+from sqlalchemy.ext.asyncio import async_sessionmaker, AsyncSession
+
 from middlewares.config import ConfigMiddleware
 from middlewares.redis import RedisMiddleware
+from app.middlewares.database import DBMiddleware
+from app.models.database import create_pool
 from typing import Union
 
 
-def register_global_middlewares(dp: Dispatcher, config: Config, redis: Redis) -> None:
-
-    middleware_types = [
-        ConfigMiddleware(config),
-        RedisMiddleware(redis)
-    ]
-
-    for middleware_type in middleware_types:
-        dp.message.outer_middleware(middleware_type)
-        dp.callback_query.outer_middleware(middleware_type)
+def setup_middlewares(
+    dp: Dispatcher,
+    pool: async_sessionmaker[AsyncSession],
+    bot_config: Config,
+    redis: Redis
+) -> None:
+    dp.update.outer_middleware(ConfigMiddleware(bot_config))
+    dp.update.outer_middleware(DBMiddleware(pool))
+    dp.update.outer_middleware(RedisMiddleware(redis))
 
 
 def get_storage(config: Config) -> Union[MemoryStorage, RedisStorage]:
@@ -56,7 +60,7 @@ async def main() -> None:
 
     dp.include_router(user_handlers.router)
     dp.include_router(admin_handlers.router)
-    register_global_middlewares(dp=dp, config=config, redis=storage.redis)
+    setup_middlewares(dp, create_pool(config.db), config, storage.redis)
 
     await bot.delete_webhook(drop_pending_updates=True)
     await dp.start_polling(bot)
@@ -65,5 +69,5 @@ async def main() -> None:
 if __name__ == '__main__':
     try:
         asyncio.run(main())
-    except (KeyboardInterrupt, SystemExit):
+    finally:
         logger.error("Bot has stopped")

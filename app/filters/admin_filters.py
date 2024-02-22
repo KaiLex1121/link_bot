@@ -1,6 +1,6 @@
 from aiogram.filters import BaseFilter
 from aiogram.types import Message
-from config_data.config import Config
+from app.config.main_config import Config
 
 
 class AdminFilter(BaseFilter):

@@ -11,10 +11,10 @@ from filters import admin_filters, common_filters
 from states.admin_states import EditLinkState
 
 from contextlib import suppress
-from asyncio import create_task
+
+
 router: Router = Router()
 router.message.filter(admin_filters.AdminFilter())
-users= []
 
 
 @router.message(
