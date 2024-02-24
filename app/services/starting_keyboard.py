@@ -7,5 +7,5 @@ def get_start_keyboard_by_role(message: Message, config: Config) -> ReplyKeyboar
     ids = config.tg_bot.admins_ids
 
     if message.from_user.id in ids:
-        return AdminKeyboards.admin_start_keyboard
+        return AdminKeyboards.start_keyboard
     return UserKeyboards.start_keyboard

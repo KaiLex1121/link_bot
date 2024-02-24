@@ -4,7 +4,7 @@ from aiogram.types import Message
 from aiogram.fsm.state import default_state
 from aiogram.fsm.storage.redis import Redis
 
-from lexicon.ru_lexicon import CommandsLexicon, UserMessagesLexicon
+from app.lexicon.messages import CommandsLexicon, UserMessages
 from keyboards.keyboards import UserKeyboards
 from app.config.main_config import Config
 from app.services import starting_keyboard
@@ -32,9 +32,9 @@ async def check_user(message: Message, dao: HolderDAO, user: dto.User):
 
 
 @router.message(CommandStart())
-async def process_start_command(message: Message, config):
+async def process_start_command(message: Message, config: Config):
     await message.answer(
-        text=UserMessagesLexicon.start_text,
+        text=UserMessages.start_text,
         reply_markup=starting_keyboard.get_start_keyboard_by_role(
             message=message, config=config
         ),
@@ -44,7 +44,7 @@ async def process_start_command(message: Message, config):
 @router.message(Text(text="Получить ссылку | Get a link"))
 async def get_link(message: Message):
     await message.answer(
-        text=UserMessagesLexicon.get_link,
+        text=UserMessages.get_link,
         reply_markup=UserKeyboards.channel_chosing_keyboard,
     )
 
@@ -77,7 +77,7 @@ async def get_help(message: Message):
 @router.message(Text(text="Как зайти на порно канал"))
 async def get_guide(message: Message):
     await message.answer(
-        text=UserMessagesLexicon.help_message, reply_markup=UserKeyboards.help_keyboard
+        text=UserMessages.help_message, reply_markup=UserKeyboards.help_keyboard
     )
 
 
@@ -91,9 +91,9 @@ async def message_to_admin(message: Message):
 
 
 @router.message(Text(text="Назад | Back"))
-async def get_back(message: Message, config):
+async def get_back(message: Message, config: Config):
     await message.answer(
-        text=UserMessagesLexicon.start_text,
+        text=UserMessages.start_text,
         reply_markup=starting_keyboard.get_start_keyboard_by_role(
             message=message, config=config
         ),
