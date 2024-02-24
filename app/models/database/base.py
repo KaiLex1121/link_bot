@@ -24,10 +24,7 @@ meta = MetaData(naming_convention=convention)
 class Base(DeclarativeBase):
     metadata = meta
 
-    created_at: Mapped[datetime] = mapped_column(
-        TIMESTAMP,
-        server_default=func.now()
-    )
+    created_at: Mapped[datetime] = mapped_column(TIMESTAMP, server_default=func.now())
 
 
 def create_pool(db_config: DbConfig) -> async_sessionmaker[AsyncSession]:

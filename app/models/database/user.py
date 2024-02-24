@@ -14,6 +14,7 @@ class User(Base):
     last_name: Mapped[str | None]
     username: Mapped[str | None]
     is_bot: Mapped[bool] = mapped_column(default=False)
+    language_code: Mapped[str | None] = mapped_column(default=None)
 
     def __repr__(self):
         rez = (
@@ -25,12 +26,13 @@ class User(Base):
             rez += f"username=@{self.username}"
         return rez + ">"
 
-    # def to_dto(self) -> dto.User:
-    #     return dto.User(
-    #         db_id=self.id,
-    #         tg_id=self.tg_id,
-    #         first_name=self.first_name,
-    #         last_name=self.last_name,
-    #         username=self.username,
-    #         is_bot=self.is_bot,
-    #     )
+    def to_dto(self) -> dto.User:
+        return dto.User(
+            db_id=self.id,
+            tg_id=self.tg_id,
+            first_name=self.first_name,
+            last_name=self.last_name,
+            username=self.username,
+            is_bot=self.is_bot,
+            language_code=self.language_code
+        )

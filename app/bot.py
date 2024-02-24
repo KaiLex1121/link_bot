@@ -10,9 +10,10 @@ from aiogram.fsm.storage.memory import MemoryStorage
 
 from sqlalchemy.ext.asyncio import async_sessionmaker, AsyncSession
 
-from middlewares.config import ConfigMiddleware
-from middlewares.redis import RedisMiddleware
+from app.middlewares.config import ConfigMiddleware
+from app.middlewares.redis import RedisMiddleware
 from app.middlewares.database import DBMiddleware
+from app.middlewares.data_loader import LoadDataMiddleware
 from app.models.database import create_pool
 from typing import Union
 
@@ -26,6 +27,7 @@ def setup_middlewares(
     dp.update.outer_middleware(ConfigMiddleware(bot_config))
     dp.update.outer_middleware(DBMiddleware(pool))
     dp.update.outer_middleware(RedisMiddleware(redis))
+    dp.update.outer_middleware(LoadDataMiddleware())
 
 
 def get_storage(config: Config) -> Union[MemoryStorage, RedisStorage]:

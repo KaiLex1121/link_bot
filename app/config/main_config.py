@@ -12,9 +12,9 @@ class TgBot:
 
     @staticmethod
     def load_from_env(env: Env):
-        token = env.str('BOT_TOKEN')
-        admin_ids = list(map(int, env.list('ADMIN_IDS')))
-        use_redis = env.bool('USE_REDIS')
+        token = env.str("BOT_TOKEN")
+        admin_ids = list(map(int, env.list("ADMIN_IDS")))
+        use_redis = env.bool("USE_REDIS")
 
         return TgBot(token=token, admins_ids=admin_ids, use_redis=use_redis)
 
@@ -24,10 +24,10 @@ class DbConfig:
     password: str
     user: str
     database: str
-    host: str = 'localhost'
+    host: str = "localhost"
     port: int = 5432
 
-    def create_uri(self, driver="asyncpg", host:str=None, port:int=None) -> str:
+    def create_uri(self, driver="asyncpg", host: str = None, port: int = None) -> str:
         if not host:
             host = self.host
         if not port:
@@ -96,7 +96,7 @@ def load_config(path: str | None) -> Config:
     config = Config(
         tg_bot=TgBot.load_from_env(env),
         redis=RedisConfig.load_from_env(env),
-        db=DbConfig.load_from_env(env)
+        db=DbConfig.load_from_env(env),
     )
 
     return config

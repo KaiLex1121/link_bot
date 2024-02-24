@@ -1,158 +1,153 @@
-from aiogram import Router, F, Dispatcher, Bot
-from aiogram.filters import Text, StateFilter, Command
+from aiogram import Router, F, Bot
+from aiogram.filters import Text, StateFilter
 from aiogram.types import Message, CallbackQuery, ContentType
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import default_state
-from aiogram.fsm.storage.redis import Redis, RedisStorage
+from aiogram.fsm.storage.redis import Redis
 
 from keyboards.inline_keyboards import InlineAdminKeyboards
 from keyboards.keyboards import AdminKeyboards
 from filters import admin_filters, common_filters
 from states.admin_states import EditLinkState
-
-from contextlib import suppress
 from app.dao.holder import HolderDAO
+from services.broadcaster import send_message_safely, broadcast
 
 
 router: Router = Router()
 router.message.filter(admin_filters.AdminFilter())
 
 
-@router.message(
-    StateFilter(default_state),
-    Text(text="Модерация бота")
-)
+@router.message(StateFilter(default_state), Text(text="Модерация бота"))
 async def admin_command_handler(message: Message):
-    await message.answer(text='Модерация бота',
-                         reply_markup=InlineAdminKeyboards.initial_admin_keyboard)
-
-
-@router.callback_query(
-    StateFilter(default_state),
-    F.data == "make_push_button_pressed"
+    await message.answer(
+        text="Модерация бота", reply_markup=InlineAdminKeyboards.initial_admin_keyboard
     )
-async def make_push_handler(callback: CallbackQuery, bot: Bot):
-    for id in range(0, 1000):
-        with suppress(Exception):
-            await bot.send_message(id, 'Check')
-            users.append(callback.from_user.id)
-    await callback.message.edit_text("Done")
 
 
-@router.callback_query(
-    StateFilter(default_state),
-    F.data == "get_links_button_pressed"
+@router.callback_query(StateFilter(default_state), F.data == "make_push_button_pressed")
+async def make_push_handler(callback: CallbackQuery, bot: Bot, dao: HolderDAO):
+    users = await dao.user.get_all()
+
+    await broadcast(
+        bot,
+        users,
+        text="Блаблаблабабалаблаба",
     )
-async def get_link_handler(callback: CallbackQuery, redis: Redis):
+    # for t in users:
+    #     user_id = t[0].tg_id
+    #     await send_message_safely(bot=bot, user_id=user_id, text=("Вам уведомление"))
 
-    main = (await redis.get(name='main_link')).decode('utf-8')
-    second = (await redis.get(name='second_link')).decode('utf-8')
 
+@router.callback_query(StateFilter(default_state), F.data == "get_links_button_pressed")
+async def get_links_handler(callback: CallbackQuery, redis: Redis):
+
+    main = (await redis.get(name="main_link")).decode("utf-8")
+    second = (await redis.get(name="second_link")).decode("utf-8")
     links_message = f"""
 Ссылка на основной канал: {main}
 
 Ссылка на порно канал: {second}"""
 
-    if callback.message.text.strip('\n') != links_message.strip('\n'):
-
-        await callback.message.edit_text(text=links_message,
-                                    reply_markup=callback.message.reply_markup,
-                                    disable_web_page_preview=True)
+    if callback.message.text.strip("\n") != links_message.strip("\n"):
+        await callback.message.edit_text(
+            text=links_message,
+            reply_markup=callback.message.reply_markup,
+            disable_web_page_preview=True,
+        )
     await callback.answer()
 
 
 @router.callback_query(
-    StateFilter(default_state),
-    F.data == "edit_links_button_pressed"
-    )
+    StateFilter(default_state), F.data == "edit_links_button_pressed"
+)
 async def edit_links_handler(callback: CallbackQuery):
-    await callback.message.edit_text(text="Выбери канал",
-                                    reply_markup=InlineAdminKeyboards.edit_links_keyboard)
+    await callback.message.edit_text(
+        text="Выбери канал", reply_markup=InlineAdminKeyboards.edit_links_keyboard
+    )
     await callback.answer()
 
 
-@router.callback_query(
-    StateFilter(default_state),
-    F.data == "get_back_button_pressed"
-    )
+@router.callback_query(StateFilter(default_state), F.data == "get_back_button_pressed")
 async def get_back_handler(callback: CallbackQuery):
-    await callback.message.edit_text(text='Модерация бота',
-                         reply_markup=InlineAdminKeyboards.initial_admin_keyboard)
+    await callback.message.edit_text(
+        text="Модерация бота", reply_markup=InlineAdminKeyboards.initial_admin_keyboard
+    )
     await callback.answer()
 
 
+@router.callback_query(StateFilter(default_state), F.data == "main_link_button_pressed")
 @router.callback_query(
-    StateFilter(default_state),
-    F.data == "main_link_button_pressed"
-    )
-@router.callback_query(
-    StateFilter(default_state),
-    F.data == "second_link_button_pressed"
-    )
+    StateFilter(default_state), F.data == "second_link_button_pressed"
+)
 async def edit_main_link_process(callback: CallbackQuery, state: FSMContext):
 
-    CHANNEL = 'Основной'
+    CHANNEL = "Основной"
     STATE = EditLinkState.FILL_MAIN_LINK
 
-    if callback.data == 'second_link_button_pressed':
-        CHANNEL = 'Порно'
+    if callback.data == "second_link_button_pressed":
+        CHANNEL = "Порно"
         STATE = EditLinkState.FILL_SECOND_LINK
 
     await callback.message.delete()
-    await callback.message.answer(text=f"Пришли ссылку на {CHANNEL} канал",
-                                  reply_markup=AdminKeyboards.admin_cancel_editing_keyboard)
+    await callback.message.answer(
+        text=f"Пришли ссылку на {CHANNEL} канал",
+        reply_markup=AdminKeyboards.admin_cancel_editing_keyboard,
+    )
     await state.set_state(STATE)
 
 
 @router.message(
     StateFilter(EditLinkState.FILL_MAIN_LINK),
     F.content_type == ContentType.TEXT,
-    common_filters.IsLink()
-    )
+    common_filters.IsLink(),
+)
 @router.message(
     StateFilter(EditLinkState.FILL_SECOND_LINK),
     F.content_type == ContentType.TEXT,
-    common_filters.IsLink()
-    )
+    common_filters.IsLink(),
+)
 async def fill_link_process(message: Message, state: FSMContext, redis: Redis):
     if await state.get_state() == EditLinkState.FILL_MAIN_LINK:
-        await redis.set(name='main_link', value=message.text)
+        await redis.set(name="main_link", value=message.text)
     else:
-        await redis.set(name='second_link', value=message.text)
+        await redis.set(name="second_link", value=message.text)
 
-    await message.answer(text=f'Ссылка изменена на «{message.text}»',
-                         reply_markup=AdminKeyboards.admin_start_keyboard,
-                         disable_web_page_preview=True)
+    await message.answer(
+        text=f"Ссылка изменена на «{message.text}»",
+        reply_markup=AdminKeyboards.admin_start_keyboard,
+        disable_web_page_preview=True,
+    )
     await state.clear()
 
 
 @router.message(
     StateFilter(EditLinkState.FILL_MAIN_LINK),
     F.content_type == ContentType.TEXT,
-    Text(text="Отменить редактирование")
-    )
+    Text(text="Отменить редактирование"),
+)
 @router.message(
     StateFilter(EditLinkState.FILL_SECOND_LINK),
     F.content_type == ContentType.TEXT,
-    Text(text="Отменить редактирование")
-    )
+    Text(text="Отменить редактирование"),
+)
 async def cancel_link_editing(message: Message, state: FSMContext):
-    await message.answer(text="Редактирование отменено",
-                         reply_markup=AdminKeyboards.admin_start_keyboard)
+    await message.answer(
+        text="Редактирование отменено", reply_markup=AdminKeyboards.admin_start_keyboard
+    )
     await state.clear()
 
 
 @router.message(
-    StateFilter(EditLinkState.FILL_MAIN_LINK),
-    F.content_type == ContentType.TEXT
-    )
+    StateFilter(EditLinkState.FILL_MAIN_LINK), F.content_type == ContentType.TEXT
+)
 @router.message(
-    StateFilter(EditLinkState.FILL_SECOND_LINK),
-    F.content_type == ContentType.TEXT
-    )
+    StateFilter(EditLinkState.FILL_SECOND_LINK), F.content_type == ContentType.TEXT
+)
 async def warning_not_link(message: Message, state: FSMContext):
-    await message.answer(text="Ты прислал не ссылку!",
-                         reply_markup=AdminKeyboards.admin_cancel_editing_keyboard)
+    await message.answer(
+        text="Ты прислал не ссылку!",
+        reply_markup=AdminKeyboards.admin_cancel_editing_keyboard,
+    )
 
 
 @router.message(~StateFilter(default_state))

@@ -25,11 +25,11 @@ class Chat(Base):
             rez += f"username=@{self.username}"
         return rez + ">"
 
-    # def to_dto(self) -> dto.Chat:
-    #     return dto.Chat(
-    #         db_id=self.id,
-    #         tg_id=self.tg_id,
-    #         type=self.type,
-    #         title=self.title,
-    #         username=self.username,
-    #     )
+#     # def to_dto(self) -> dto.Chat:
+#     #     return dto.Chat(
+#     #         db_id=self.id,
+#     #         tg_id=self.tg_id,
+#     #         type=self.type,
+#     #         title=self.title,
+#     #         username=self.username,
+#     #     )
