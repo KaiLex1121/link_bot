@@ -5,17 +5,135 @@ from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import default_state
 from aiogram.fsm.storage.redis import Redis
 
+import app.services
 from keyboards.inline_keyboards import InlineAdminKeyboards
 from keyboards.keyboards import AdminKeyboards
 from lexicon.messages import AdminMessages
 from filters import admin_filters, common_filters
-from states.admin_states import EditLinkState
+import sqlalchemy
+from states.admin_states import EditLinkState, MakeBroadcastState
 from app.dao.holder import HolderDAO
 from services.broadcaster import broadcast
+from app.keyboards.keyboards import UserKeyboards
+from app.models.database.base import meta
 
 
 router: Router = Router()
 router.message.filter(admin_filters.AdminFilter())
+
+
+
+
+@router.callback_query(
+    StateFilter(default_state),
+    F.data == 'make_broadcast_button_pressed'
+)
+async def create_broadcast(callback: CallbackQuery, state: FSMContext):
+
+    await callback.message.delete()
+
+    await callback.message.answer(
+        text="Пришли сообщение, которое хочешь использовать в рассыкле. Его можно будет отредактировать",
+        reply_markup=AdminKeyboards.cancel_editing_keyboard,
+    )
+
+    await state.set_state(MakeBroadcastState.MESSAGE_TEXT_WRITING)
+
+
+@router.message(
+    StateFilter(MakeBroadcastState.MESSAGE_TEXT_WRITING),
+    F.content_type == ContentType.TEXT,
+    F.text != "Отменить редактирование"
+
+)
+async def broadcast_text_preview(
+    message: Message,
+    bot: Bot,
+    state: FSMContext
+):
+
+    message_text = message.text
+
+    new_message = await message.answer(
+        text='_',
+        reply_markup=AdminKeyboards.start_keyboard,
+    )
+
+    await bot.delete_message(
+        message_id=new_message.message_id,
+        chat_id=new_message.chat.id
+    )
+
+    message_to_delete = await message.answer(
+        text=message_text,
+        reply_markup=InlineAdminKeyboards.broadcast_preview_keyboard
+    )
+
+    await state.update_data({
+        'message_to_delete': message_to_delete.message_id
+    })
+
+    await state.update_data({
+        'broadcast_text': message_text
+    })
+
+
+    await state.set_state(MakeBroadcastState.BROADCAST_PREVIEW)
+
+
+@router.callback_query(
+    StateFilter(MakeBroadcastState.BROADCAST_PREVIEW),
+    F.data == 'cancel_broadcast_button_pressed'
+)
+async def cancel_broadcast(callback: CallbackQuery, bot: Bot, state: FSMContext):
+
+    msg_cor = await state.get_data()
+    previous_message = msg_cor['message_to_delete']
+
+    await bot.delete_message(
+        chat_id=callback.message.chat.id,
+        message_id=previous_message
+    )
+
+    await callback.message.answer(
+        text="Редактирование отменено",
+        reply_markup=AdminKeyboards.start_keyboard
+    )
+
+    await state.clear()
+
+
+@router.callback_query(
+    StateFilter(MakeBroadcastState.BROADCAST_PREVIEW),
+    F.data == 'confirm_broadcast_button_pressed'
+)
+async def confirm_broadcast(callback: CallbackQuery, bot: Bot, state: FSMContext, dao: HolderDAO):
+    users = await dao.user.get_all()
+
+    msg_cor = await state.get_data()
+    broadcast_text = msg_cor['broadcast_text']
+    previous_message = msg_cor['message_to_delete']
+
+    users_count = await broadcast(
+        bot,
+        users,
+        text=broadcast_text
+    )
+
+    await bot.delete_message(
+        chat_id=callback.message.chat.id,
+        message_id=previous_message
+    )
+
+    await callback.message.answer(
+        text=f"Сообщение доставлено {users_count} подпищекам",
+        reply_markup=AdminKeyboards.start_keyboard
+    )
+
+    await state.clear()
+
+
+
 
 
 @router.message(StateFilter(default_state), Text(text="Модерация бота"))
@@ -28,23 +146,9 @@ async def admin_command_handler(message: Message):
 
 @router.callback_query(
     StateFilter(default_state),
-    F.data == 'make_push_button_pressed'
-    )
-async def make_push(bot: Bot, dao: HolderDAO):
-    users = await dao.user.get_all()
-
-    await broadcast(
-        bot,
-        users,
-        text="Блаблаб лабабал аблаба"
-    )
-
-
-@router.callback_query(
-    StateFilter(default_state),
     F.data == 'get_links_button_pressed'
 )
-async def get_links_handler(callback: CallbackQuery, redis: Redis):
+async def get_links(callback: CallbackQuery, redis: Redis):
 
     main = (await redis.get(name="main_link")).decode("utf-8")
     second = (await redis.get(name="second_link")).decode("utf-8")
@@ -63,7 +167,7 @@ async def get_links_handler(callback: CallbackQuery, redis: Redis):
     StateFilter(default_state),
     F.data == "edit_links_button_pressed"
 )
-async def edit_links_handler(callback: CallbackQuery):
+async def edit_links(callback: CallbackQuery):
     await callback.message.edit_text(
         text="Выбери канал",
         reply_markup=InlineAdminKeyboards.edit_links_keyboard
@@ -75,7 +179,7 @@ async def edit_links_handler(callback: CallbackQuery):
     StateFilter(default_state),
     F.data == "get_back_button_pressed"
 )
-async def get_back_handler(callback: CallbackQuery):
+async def get_back(callback: CallbackQuery):
     await callback.message.edit_text(
         text="Модерация бота",
         reply_markup=InlineAdminKeyboards.initial_keyboard
@@ -103,7 +207,7 @@ async def edit_main_link_process(callback: CallbackQuery, state: FSMContext):
     await callback.message.delete()
     await callback.message.answer(
         text=f"Пришли ссылку на {CHANNEL} канал",
-        reply_markup=AdminKeyboards.cancel_link_editing_keyboard,
+        reply_markup=AdminKeyboards.cancel_editing_keyboard,
     )
     await state.set_state(STATE)
 
@@ -142,9 +246,15 @@ async def fill_link_process(message: Message, state: FSMContext, redis: Redis):
     F.content_type == ContentType.TEXT,
     Text(text="Отменить редактирование"),
 )
+@router.message(
+    StateFilter(MakeBroadcastState.MESSAGE_TEXT_WRITING),
+    F.content_type == ContentType.TEXT,
+    Text(text="Отменить редактирование")
+)
 async def cancel_link_editing(message: Message, state: FSMContext):
     await message.answer(
-        text="Редактирование отменено", reply_markup=AdminKeyboards.start_keyboard
+        text="Редактирование отменено",
+        reply_markup=AdminKeyboards.start_keyboard
     )
     await state.clear()
 
@@ -160,7 +270,7 @@ async def cancel_link_editing(message: Message, state: FSMContext):
 async def warning_not_link(message: Message, state: FSMContext):
     await message.answer(
         text="Ты прислал не ссылку!",
-        reply_markup=AdminKeyboards.cancel_link_editing_keyboard,
+        reply_markup=AdminKeyboards.cancel_editing_keyboard,
     )
 
 

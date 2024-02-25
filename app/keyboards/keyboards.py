@@ -57,7 +57,7 @@ class AdminKeyboards:
         ],
         resize_keyboard=True,
     )
-    cancel_link_editing_keyboard = ReplyKeyboardMarkup(
+    cancel_editing_keyboard = ReplyKeyboardMarkup(
         keyboard=[[AdminButtons.cancel_link_editing_button]],
         resize_keyboard=True,
         is_persistent=True,

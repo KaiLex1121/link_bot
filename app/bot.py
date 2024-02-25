@@ -72,4 +72,4 @@ if __name__ == '__main__':
     try:
         asyncio.run(main())
     finally:
-        logger.error("Bot has stopped")
+        logger.error("Bot has been stopped")
