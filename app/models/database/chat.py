@@ -2,7 +2,7 @@ from sqlalchemy import Enum, BigInteger
 from sqlalchemy.orm import mapped_column, Mapped
 
 from app.enums.chat_type import TypeOfChat
-from app.models import dto
+# from app.models import dto
 from app.models.database.base import Base
 
 

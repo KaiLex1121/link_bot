@@ -1,9 +1,7 @@
-from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 
 from app.dao import BaseDAO
-from app.models import dto
 from app.models.database import Chat
 
 
@@ -12,5 +10,8 @@ class ChatDAO(BaseDAO[Chat]):
         super().__init__(Chat, session)
 
     async def get_by_tg_id(self, tg_id: int) -> Chat:
-        result = await self.session.execute(select(Chat).where(Chat.tg_id == tg_id))
+        result = await self.session.execute(
+            select(Chat).where(Chat.tg_id == tg_id)
+        )
+
         return result.scalar_one()

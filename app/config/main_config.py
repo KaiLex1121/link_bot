@@ -27,7 +27,12 @@ class DbConfig:
     host: str = "localhost"
     port: int = 5432
 
-    def create_uri(self, driver="asyncpg", host: str = None, port: int = None) -> str:
+    def create_uri(
+        self,
+        driver: str = "asyncpg",
+        host: str = None,
+        port: int = None
+    ) -> str:
         if not host:
             host = self.host
         if not port:
@@ -46,7 +51,11 @@ class DbConfig:
         port = env.int("DB_PORT", 5432)
 
         return DbConfig(
-            host=host, password=password, user=user, database=database, port=port
+            host=host,
+            password=password,
+            user=user,
+            database=database,
+            port=port
         )
 
 

@@ -5,7 +5,6 @@ from sqlalchemy.future import select
 from app.dao.base import BaseDAO
 from app.models.database import User
 from app.models import dto
-from aiogram import types
 
 
 class UserDAO(BaseDAO[User]):
@@ -13,7 +12,9 @@ class UserDAO(BaseDAO[User]):
         super().__init__(User, session)
 
     async def get_by_tg_id(self, tg_id: int) -> User:
-        result = await self.session.execute(select(User).where(User.tg_id == tg_id))
+        result = await self.session.execute(
+            select(User).where(User.tg_id == tg_id)
+        )
         return result.scalar_one()
 
     async def upsert_user(self, user: dto.User) -> dto.User:

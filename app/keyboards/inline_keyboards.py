@@ -25,21 +25,16 @@ class InlineAdminButtons:
 
     make_broadcast_button = InlineKeyboardButton(
         text="Создать рассылку",
-        callback_data="make_broadcast_button_pressed"
-    )
-
-    edit_broadcast_button = InlineKeyboardButton(
-        text="Изменить сообщение",
-        callback_data="edit_broadcast_button_pressed"
+        callback_data="create_broadcast_button_pressed"
     )
 
     cancel_broadcast_button = InlineKeyboardButton(
-        text="Отменить рассылку",
+        text="❌ ОТМЕНИТЬ ❌",
         callback_data="cancel_broadcast_button_pressed"
     )
 
     confirm_broadcast_button = InlineKeyboardButton(
-        text="Отправить рассылку",
+        text="✅ ОТПРАВИТЬ ✅",
         callback_data="confirm_broadcast_button_pressed"
     )
 
@@ -73,11 +68,9 @@ class InlineAdminKeyboards:
     broadcast_preview_keyboard = InlineKeyboardMarkup(
         inline_keyboard=[
             [
-                InlineAdminButtons.edit_broadcast_button,
+                InlineAdminButtons.confirm_broadcast_button,
                 InlineAdminButtons.cancel_broadcast_button
+
             ],
-            [
-                InlineAdminButtons.confirm_broadcast_button
-            ]
         ]
     )
