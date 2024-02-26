@@ -21,7 +21,7 @@ config.set_main_option(
 
 config.set_main_option(
     "sqlalchemy.url",
-    "postgresql+asyncpg://test:Alexei3214@localhost:5432/link_bot_test"
+    "postgresql+asyncpg://user:pass@localhost:5432/link_bot_test"
 )
 
 # Interpret the config file for Python logging.
