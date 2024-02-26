@@ -1,5 +1,5 @@
-from app.dao import UserDAO
-from app.models import dto
+from src.dao import UserDAO
+from src.models import dto
 
 
 async def upsert_user(user: dto.User, user_dao: UserDAO) -> dto.User:

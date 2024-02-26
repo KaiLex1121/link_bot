@@ -1,7 +1,7 @@
 import asyncio
 import logging
 
-from app.config.main_config import load_config, Config
+from src.config.main_config import load_config, Config
 from aiogram import Bot, Dispatcher
 from handlers import user_handlers, admin_handlers
 from aiogram.fsm.storage.redis import RedisStorage, DefaultKeyBuilder, Redis
@@ -10,11 +10,11 @@ from aiogram.fsm.storage.memory import MemoryStorage
 
 from sqlalchemy.ext.asyncio import async_sessionmaker, AsyncSession
 
-from app.middlewares.config import ConfigMiddleware
-from app.middlewares.redis import RedisMiddleware
-from app.middlewares.database import DBMiddleware
-from app.middlewares.data_loader import LoadDataMiddleware
-from app.models.database import create_pool
+from src.middlewares.config import ConfigMiddleware
+from src.middlewares.redis import RedisMiddleware
+from src.middlewares.database import DBMiddleware
+from src.middlewares.data_loader import LoadDataMiddleware
+from src.models.database import create_pool
 from typing import Union
 
 

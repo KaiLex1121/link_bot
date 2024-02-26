@@ -1,6 +1,6 @@
 from keyboards.keyboards import UserKeyboards, AdminKeyboards
 from aiogram.types import Message, ReplyKeyboardMarkup
-from app.config.main_config import Config
+from src.config.main_config import Config
 
 
 def get_start_keyboard_by_role(

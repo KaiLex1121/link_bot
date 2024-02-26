@@ -1,8 +1,8 @@
 from sqlalchemy import BigInteger
 from sqlalchemy.orm import mapped_column, Mapped
 
-from app.models import dto
-from app.models.database.base import Base
+from src.models import dto
+from src.models.database.base import Base
 
 
 class User(Base):

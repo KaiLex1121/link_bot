@@ -8,7 +8,7 @@ from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy.sql.functions import func
 from datetime import datetime
 
-from app.config.main_config import DbConfig
+from src.config.main_config import DbConfig
 
 
 convention = {

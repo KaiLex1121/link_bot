@@ -4,12 +4,12 @@ from aiogram.types import Message
 from aiogram.fsm.state import default_state
 from aiogram.fsm.storage.redis import Redis
 
-from app.lexicon.messages import CommandsLexicon, UserMessages
+from src.lexicon.messages import CommandsLexicon, UserMessages
 from keyboards.keyboards import UserKeyboards
-from app.config.main_config import Config
-from app.services import starting_keyboard
+from src.config.main_config import Config
+from src.services import starting_keyboard
 from dao.holder import HolderDAO
-from app.models import dto
+from src.models import dto
 
 
 router: Router = Router()

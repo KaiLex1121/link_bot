@@ -11,7 +11,7 @@ from lexicon.messages import AdminMessages
 from filters import admin_filters, common_filters
 
 from states.admin_states import EditLinkState, MakeBroadcastState
-from app.dao.holder import HolderDAO
+from src.dao.holder import HolderDAO
 from services.broadcaster import broadcast
 
 
