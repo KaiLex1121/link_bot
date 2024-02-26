@@ -1,8 +1,8 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 
-from app.dao import BaseDAO
-from app.models.database import Chat
+from app.dao.base import BaseDAO
+from app.models.database.chat import Chat
 
 
 class ChatDAO(BaseDAO[Chat]):

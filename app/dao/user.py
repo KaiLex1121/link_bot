@@ -3,7 +3,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 
 from app.dao.base import BaseDAO
-from app.models.database import User
+from app.models.database.user import User
 from app.models import dto
 
 

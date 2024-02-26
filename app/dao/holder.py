@@ -1,7 +1,8 @@
 from dataclasses import dataclass, field
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.dao import UserDAO, ChatDAO
+from app.dao.chat import ChatDAO
+from app.dao.user import UserDAO
 
 
 @dataclass

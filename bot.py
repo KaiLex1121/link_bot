@@ -14,7 +14,7 @@ from app.middlewares.config import ConfigMiddleware
 from app.middlewares.redis import RedisMiddleware
 from app.middlewares.database import DBMiddleware
 from app.middlewares.data_loader import LoadDataMiddleware
-from app.models.database import create_pool
+from app.models.database.base import create_pool
 from typing import Union
 
 
