@@ -4,7 +4,7 @@ from aiogram import BaseMiddleware
 from aiogram.types import TelegramObject
 from sqlalchemy.ext.asyncio import async_sessionmaker, AsyncSession
 
-from src.dao.holder import HolderDAO
+from app.dao.holder import HolderDAO
 
 
 class DBMiddleware(BaseMiddleware):

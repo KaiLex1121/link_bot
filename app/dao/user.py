@@ -2,9 +2,9 @@ from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 
-from src.dao.base import BaseDAO
-from src.models.database import User
-from src.models import dto
+from app.dao.base import BaseDAO
+from app.models.database import User
+from app.models import dto
 
 
 class UserDAO(BaseDAO[User]):

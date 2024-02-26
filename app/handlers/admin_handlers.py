@@ -5,14 +5,14 @@ from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import default_state
 from aiogram.fsm.storage.redis import Redis
 
-from keyboards.inline_keyboards import InlineAdminKeyboards
-from keyboards.keyboards import AdminKeyboards
-from lexicon.messages import AdminMessages
-from filters import admin_filters, common_filters
+from app.keyboards.inline_keyboards import InlineAdminKeyboards
+from app.keyboards.reply_keyboards import AdminKeyboards
+from app.lexicon.messages import AdminMessages
+from app.filters import admin_filters, common_filters
 
-from states.admin_states import EditLinkState, MakeBroadcastState
-from src.dao.holder import HolderDAO
-from services.broadcaster import broadcast
+from app.states.admin_states import EditLinkState, MakeBroadcastState
+from app.dao.holder import HolderDAO
+from app.services.broadcaster import broadcast
 
 
 router: Router = Router()

@@ -3,11 +3,11 @@ from typing import Callable, Any, Awaitable
 from aiogram import BaseMiddleware
 from aiogram.types import TelegramObject
 
-from src.dao.holder import HolderDAO
-from src.models import dto
+from app.dao.holder import HolderDAO
+from app.models import dto
 
 # from app.services.chat import upsert_chat
-from src.services.user import upsert_user
+from app.services.user import upsert_user
 
 
 class LoadDataMiddleware(BaseMiddleware):
