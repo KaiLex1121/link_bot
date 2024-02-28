@@ -13,3 +13,7 @@ class MakeBroadcastState(StatesGroup):
     BROADCAST_CANCDELED = State()
     BACK_BUTTON_PRESSED = State()
     SUCCESS_BROADCAST = State()
+
+
+class GetStatisticState(StatesGroup):
+    PRESS_GET_BACK = State()

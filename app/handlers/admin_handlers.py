@@ -10,13 +10,79 @@ from app.keyboards.reply_keyboards import AdminKeyboards
 from app.lexicon.messages import AdminMessages
 from app.filters import admin_filters, common_filters
 
-from app.states.admin_states import EditLinkState, MakeBroadcastState
+from app.states.admin_states import EditLinkState, MakeBroadcastState, GetStatisticState
 from app.dao.holder import HolderDAO
 from app.services.broadcaster import broadcast
-
+from datetime import datetime, timedelta
 
 router: Router = Router()
 router.message.filter(admin_filters.AdminFilter())
+
+
+@router.callback_query(
+    StateFilter(GetStatisticState.PRESS_GET_BACK),
+    F.data == 'last_seven_days_button_pressed'
+)
+async def get_users_for_seven_days(callback: CallbackQuery, dao: HolderDAO):
+    users_count = await dao.user.get_for_seven_days()
+    message_text = f"За последние 7 дней {users_count} новых пользователей"
+
+    if message_text != callback.message.text:
+
+        await callback.message.edit_text(
+            text=message_text,
+            reply_markup=callback.message.reply_markup
+        )
+
+    await callback.answer()
+
+
+
+@router.callback_query(
+    StateFilter(GetStatisticState.PRESS_GET_BACK),
+    F.data == 'users_count_button_pressed'
+)
+async def get_all_users(callback: CallbackQuery, dao: HolderDAO):
+    users_count = await dao.user.count()
+    message_text = f"Ботом пользуются {users_count} человек"
+
+    if message_text != callback.message.text:
+
+        await callback.message.edit_text(
+            text=message_text,
+            reply_markup=callback.message.reply_markup
+        )
+
+    await callback.answer()
+
+
+@router.callback_query(
+    StateFilter(GetStatisticState.PRESS_GET_BACK),
+    F.data == 'get_back_button_pressed'
+)
+async def back_button_in_statistic(callback: CallbackQuery, state: FSMContext):
+    await callback.message.edit_text(
+        text="Модерация бота",
+        reply_markup=InlineAdminKeyboards.initial_keyboard
+    )
+
+    await callback.answer()
+
+    await state.clear()
+
+@router.callback_query(
+    StateFilter(default_state),
+    F.data == 'get_statistic_button_pressed'
+)
+async def get_statistic(callback: CallbackQuery, state: FSMContext):
+    await callback.message.edit_text(
+        text="Выбери нужное",
+        reply_markup=InlineAdminKeyboards.statistic_keyboard
+    )
+
+    await callback.answer()
+
+    await state.set_state(GetStatisticState.PRESS_GET_BACK)
 
 
 @router.callback_query(

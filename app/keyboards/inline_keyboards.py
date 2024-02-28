@@ -38,6 +38,21 @@ class InlineAdminButtons:
         callback_data="confirm_broadcast_button_pressed"
     )
 
+    get_statistic_button = InlineKeyboardButton(
+        text="Статистика",
+        callback_data="get_statistic_button_pressed"
+    )
+
+    users_count_button = InlineKeyboardButton(
+        text="Количество всех пользователей",
+        callback_data="users_count_button_pressed"
+    )
+
+    last_seven_days_uers_count_button = InlineKeyboardButton(
+        text="Пользователи за последние 7 дней",
+        callback_data="last_seven_days_button_pressed"
+    )
+
 
 class InlineAdminKeyboards:
 
@@ -50,6 +65,9 @@ class InlineAdminKeyboards:
             [
                 InlineAdminButtons.make_broadcast_button
             ],
+            [
+                InlineAdminButtons.get_statistic_button
+            ]
         ]
     )
 
@@ -72,5 +90,17 @@ class InlineAdminKeyboards:
                 InlineAdminButtons.cancel_broadcast_button
 
             ],
+        ]
+    )
+
+    statistic_keyboard = InlineKeyboardMarkup(
+        inline_keyboard=[
+            [
+                InlineAdminButtons.users_count_button,
+                InlineAdminButtons.last_seven_days_uers_count_button
+            ],
+            [
+                InlineAdminButtons.get_back_button
+            ]
         ]
     )
