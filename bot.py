@@ -1,6 +1,8 @@
 import asyncio
 import logging
 
+from typing import Union
+
 from app.config.main_config import load_config, Config
 from aiogram import Bot, Dispatcher
 from app.handlers import user_handlers, admin_handlers
@@ -15,7 +17,6 @@ from app.middlewares.redis import RedisMiddleware
 from app.middlewares.database import DBMiddleware
 from app.middlewares.data_loader import LoadDataMiddleware
 from app.models.database.base import create_pool
-from typing import Union
 
 
 def setup_middlewares(
