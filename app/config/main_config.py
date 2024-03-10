@@ -24,7 +24,7 @@ class DbConfig:
     password: str
     user: str
     database: str
-    host: str = "localhost"
+    host: str
     port: int = 5432
 
     def create_uri(
