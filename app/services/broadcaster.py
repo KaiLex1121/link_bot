@@ -57,7 +57,8 @@ async def broadcast(
             ):
                 count += 1
             await asyncio.sleep(
-                0.05
+                10
+                # 0.05
             )  # 20 messages per second (Limit: 30 messages per second)
     finally:
         logging.info(f"{count} messages successful sent.")

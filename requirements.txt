@@ -21,8 +21,6 @@ MarkupSafe==2.1.5
 marshmallow==3.19.0
 mccabe==0.7.0
 multidict==6.0.4
-mypy==1.4.1
-mypy-extensions==1.0.0
 packaging==23.1
 pycodestyle==2.10.0
 pydantic==1.10.11

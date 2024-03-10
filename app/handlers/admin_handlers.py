@@ -4,7 +4,7 @@ from aiogram.types import Message, CallbackQuery, ContentType
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import default_state
 from aiogram.fsm.storage.redis import Redis
-
+from aiogram.exceptions import TelegramBadRequest
 from app.keyboards.inline_keyboards import InlineAdminKeyboards
 from app.keyboards.reply_keyboards import AdminKeyboards
 from app.lexicon.messages import AdminMessages
@@ -90,19 +90,25 @@ async def get_statistic(callback: CallbackQuery, state: FSMContext):
     F.data == 'create_broadcast_button_pressed'
 )
 async def create_broadcast(callback: CallbackQuery, state: FSMContext):
+    try:
+        await callback.message.delete()
 
-    await callback.message.delete()
+        message_to_delete = await callback.message.answer(
+            text="Пришли сообщение, которое хочешь отправить",
+            reply_markup=AdminKeyboards.cancel_editing_keyboard,
+        )
 
-    message_to_delete = await callback.message.answer(
-        text="Пришли сообщение, которое хочешь отправить",
-        reply_markup=AdminKeyboards.cancel_editing_keyboard,
-    )
+        await state.update_data({
+            'message_to_delete': message_to_delete.message_id
+        })
 
-    await state.update_data({
-        'message_to_delete': message_to_delete.message_id
-    })
+        await state.set_state(MakeBroadcastState.MESSAGE_TEXT_WRITING)
 
-    await state.set_state(MakeBroadcastState.MESSAGE_TEXT_WRITING)
+    except TelegramBadRequest:
+        await callback.message.edit_text(
+            text="Это собщение не подойдет для рассылки, нажми 'Модерация' еще раз",
+            reply_markup=callback.message.reply_markup
+        )
 
 
 @router.message(
@@ -172,18 +178,22 @@ async def confirm_broadcast(
     fsm_data = await state.get_data()
     broadcast_text = fsm_data['broadcast_text']
 
+    await callback.message.edit_text(
+        text='Идет отправка'
+    )
+
     users_count = await broadcast(
         bot,
         users,
         text=broadcast_text
     )
 
-    await callback.message.delete()
-
     await callback.message.answer(
         text=f"Сообщение доставлено {users_count} подпищекам",
         reply_markup=AdminKeyboards.start_keyboard
     )
+
+    await callback.message.delete()
 
     await state.clear()
 
