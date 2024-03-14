@@ -16,4 +16,4 @@ class MakeBroadcastState(StatesGroup):
 
 
 class GetStatisticState(StatesGroup):
-    PRESS_GET_BACK = State()
+    ...

@@ -3,6 +3,7 @@ from aiogram.filters import Command, Text, CommandStart, StateFilter
 from aiogram.types import Message
 from aiogram.fsm.state import default_state
 from aiogram.fsm.storage.redis import Redis
+from aiogram.fsm.context import FSMContext
 
 from app.lexicon.messages import CommandsLexicon, UserMessages
 from app.keyboards.reply_keyboards import UserKeyboards
@@ -13,7 +14,7 @@ from app.models import dto
 
 
 router: Router = Router()
-router.message.filter(StateFilter(default_state))
+# router.message.filter(StateFilter(default_state))
 
 
 @router.message(Command(commands=["help"]))

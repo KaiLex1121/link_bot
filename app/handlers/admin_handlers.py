@@ -20,12 +20,46 @@ router.message.filter(admin_filters.AdminFilter())
 
 
 @router.callback_query(
-    StateFilter(GetStatisticState.PRESS_GET_BACK),
-    F.data == 'last_seven_days_button_pressed'
+    F.data == 'week_active_users_button'
 )
 async def get_users_for_seven_days(callback: CallbackQuery, dao: HolderDAO):
-    users_count = await dao.user.get_for_seven_days()
-    message_text = f"За последние 7 дней {users_count} новых пользователей"
+    users_count = await dao.user.get_active_users_count_by_days(days=1)
+    message_text = f"Активных пользователей за 7 дней: {users_count}"
+
+    if message_text != callback.message.text:
+
+        await callback.message.edit_text(
+            text=message_text,
+            reply_markup=callback.message.reply_markup
+        )
+
+    await callback.answer()
+
+
+@router.callback_query(
+    F.data == 'yestarday_active_users_button'
+)
+async def get_users_for_seven_days(callback: CallbackQuery, dao: HolderDAO):
+    users_count = await dao.user.get_active_users_count_by_days(days=1)
+    message_text = f"Активных пользователей за вчера: {users_count}"
+
+    if message_text != callback.message.text:
+
+        await callback.message.edit_text(
+            text=message_text,
+            reply_markup=callback.message.reply_markup
+        )
+
+    await callback.answer()
+
+
+@router.callback_query(
+    StateFilter(default_state),
+    F.data == 'yesterday_new_users_button'
+)
+async def get_users_for_seven_days(callback: CallbackQuery, dao: HolderDAO):
+    users_count = await dao.user.get_new_users_count_by_days(days=1)
+    message_text = f"Новых пользователей за вчера: {users_count}"
 
     if message_text != callback.message.text:
 
@@ -39,12 +73,11 @@ async def get_users_for_seven_days(callback: CallbackQuery, dao: HolderDAO):
 
 
 @router.callback_query(
-    StateFilter(GetStatisticState.PRESS_GET_BACK),
-    F.data == 'users_count_button_pressed'
+    F.data == 'users_count_button'
 )
 async def get_all_users(callback: CallbackQuery, dao: HolderDAO):
     users_count = await dao.user.count()
-    message_text = f"Ботом пользуются {users_count} человек"
+    message_text = f"Всего пользователей: {users_count}"
 
     if message_text != callback.message.text:
 
@@ -57,8 +90,7 @@ async def get_all_users(callback: CallbackQuery, dao: HolderDAO):
 
 
 @router.callback_query(
-    StateFilter(GetStatisticState.PRESS_GET_BACK),
-    F.data == 'get_back_button_pressed'
+    F.data == 'get_back_button'
 )
 async def back_button_in_statistic(callback: CallbackQuery, state: FSMContext):
     await callback.message.edit_text(
@@ -72,7 +104,7 @@ async def back_button_in_statistic(callback: CallbackQuery, state: FSMContext):
 
 @router.callback_query(
     StateFilter(default_state),
-    F.data == 'get_statistic_button_pressed'
+    F.data == 'get_statistic_button'
 )
 async def get_statistic(callback: CallbackQuery, state: FSMContext):
     await callback.message.edit_text(
@@ -81,8 +113,6 @@ async def get_statistic(callback: CallbackQuery, state: FSMContext):
     )
 
     await callback.answer()
-
-    await state.set_state(GetStatisticState.PRESS_GET_BACK)
 
 
 @router.callback_query(
@@ -338,11 +368,13 @@ async def warning_not_link(message: Message, state: FSMContext):
     )
 
 
+@router.message()
 async def message_echo(message: Message, state: FSMContext):
     state = await state.get_state()
-    await message.answer(text=f"Message попал сюда c состоянием {state}")
+    await message.answer(text=f"Это сообщение отображается только у администраторов: «Message попал сюда c состоянием {state}»")
 
 
+@router.callback_query()
 async def callback_echo(callback: CallbackQuery, state: FSMContext):
     state = await state.get_state()
-    await callback.answer(text=f"Callback попал сюда c состоянием {state}")
+    await callback.answer(text=f"Это сообщение отображается только у администраторов: «Message попал сюда c состоянием {state}»")

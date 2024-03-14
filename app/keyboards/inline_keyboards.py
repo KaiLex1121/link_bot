@@ -40,19 +40,28 @@ class InlineAdminButtons:
 
     get_statistic_button = InlineKeyboardButton(
         text="Статистика",
-        callback_data="get_statistic_button_pressed"
+        callback_data="get_statistic_button"
     )
 
     users_count_button = InlineKeyboardButton(
-        text="Количество всех пользователей",
-        callback_data="users_count_button_pressed"
+        text="Все пользователи",
+        callback_data="users_count_button"
     )
 
-    last_seven_days_uers_count_button = InlineKeyboardButton(
-        text="Пользователи за последние 7 дней",
-        callback_data="last_seven_days_button_pressed"
+    yesterday_new_users = InlineKeyboardButton(
+        text="Новые пользователи за вчера",
+        callback_data="yesterday_new_users_button"
     )
 
+    yesterday_active_users = InlineKeyboardButton(
+        text="Активные пользователи за вчера",
+        callback_data="yestarday_active_users_button"
+    )
+
+    week_active_users = InlineKeyboardButton(
+        text="Активные пользователи за вчера",
+        callback_data="week_active_users_button"
+    )
 
 class InlineAdminKeyboards:
 
@@ -97,7 +106,11 @@ class InlineAdminKeyboards:
         inline_keyboard=[
             [
                 InlineAdminButtons.users_count_button,
-                InlineAdminButtons.last_seven_days_uers_count_button
+                InlineAdminButtons.yesterday_new_users
+            ],
+            [
+                InlineAdminButtons.week_active_users,
+                InlineAdminButtons.yesterday_active_users
             ],
             [
                 InlineAdminButtons.get_back_button

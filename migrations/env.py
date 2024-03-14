@@ -17,8 +17,15 @@ config = context.config
 
 config.set_main_option(
     "sqlalchemy.url",
-    "postgresql+asyncpg://user:pass@pg_database:5432/db_name"
+    "postgresql+asyncpg://user:password@host:5432/db_name"
 )
+
+# Docker config
+
+# config.set_main_option(
+#     "sqlalchemy.url",
+#     "postgresql+asyncpg://user:password@pg_database:5432/db_name"
+# )
 
 # Interpret the config file for Python logging.
 # This line sets up loggers basically.
