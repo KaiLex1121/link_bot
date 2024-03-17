@@ -22,7 +22,7 @@ router.message.filter(admin_filters.AdminFilter())
 @router.callback_query(
     F.data == 'week_active_users_button'
 )
-async def get_users_for_seven_days(callback: CallbackQuery, dao: HolderDAO):
+async def get_active_users_for_week(callback: CallbackQuery, dao: HolderDAO):
     users_count = await dao.user.get_active_users_count_by_days(days=7)
     message_text = f"Активных пользователей за 7 дней: {users_count}"
 
@@ -39,7 +39,7 @@ async def get_users_for_seven_days(callback: CallbackQuery, dao: HolderDAO):
 @router.callback_query(
     F.data == 'yestarday_active_users_button'
 )
-async def get_users_for_seven_days(callback: CallbackQuery, dao: HolderDAO):
+async def get_active_users_for_yesterday(callback: CallbackQuery, dao: HolderDAO):
     users_count = await dao.user.get_active_users_count_by_days(days=1)
     message_text = f"Активных пользователей за вчера: {users_count}"
 
@@ -57,7 +57,7 @@ async def get_users_for_seven_days(callback: CallbackQuery, dao: HolderDAO):
     StateFilter(default_state),
     F.data == 'yesterday_new_users_button'
 )
-async def get_users_for_seven_days(callback: CallbackQuery, dao: HolderDAO):
+async def get_new_users_for_seven_days(callback: CallbackQuery, dao: HolderDAO):
     users_count = await dao.user.get_new_users_count_by_days(days=1)
     message_text = f"Новых пользователей за вчера: {users_count}"
 
@@ -79,7 +79,6 @@ async def get_all_users(callback: CallbackQuery, dao: HolderDAO):
     users_count = await dao.user.count()
     message_text = f"Всего пользователей: {users_count}"
 
-    test = await dao.user.test()
     for item in test:
         print(item)
 
