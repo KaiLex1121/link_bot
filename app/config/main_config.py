@@ -90,7 +90,6 @@ class Config:
     redis: Optional[RedisConfig] = None
 
 
-@lru_cache
 def _get_environment(path: str | None = None) -> Env:
     env: Env = Env()
     env.read_env(path=path)
@@ -98,7 +97,6 @@ def _get_environment(path: str | None = None) -> Env:
     return env
 
 
-@lru_cache
 def load_config(path: str | None) -> Config:
     env = _get_environment(path)
 

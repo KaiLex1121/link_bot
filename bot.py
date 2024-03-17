@@ -56,7 +56,7 @@ async def main() -> None:
     )
     logger.info("Bot has started")
 
-    config = load_config('.env')
+    config = load_config(None)
     storage = get_storage(config=config)
     bot = Bot(config.tg_bot.token)
     dp = Dispatcher(storage=storage)

@@ -23,7 +23,7 @@ router.message.filter(admin_filters.AdminFilter())
     F.data == 'week_active_users_button'
 )
 async def get_users_for_seven_days(callback: CallbackQuery, dao: HolderDAO):
-    users_count = await dao.user.get_active_users_count_by_days(days=1)
+    users_count = await dao.user.get_active_users_count_by_days(days=7)
     message_text = f"Активных пользователей за 7 дней: {users_count}"
 
     if message_text != callback.message.text:
@@ -78,6 +78,10 @@ async def get_users_for_seven_days(callback: CallbackQuery, dao: HolderDAO):
 async def get_all_users(callback: CallbackQuery, dao: HolderDAO):
     users_count = await dao.user.count()
     message_text = f"Всего пользователей: {users_count}"
+
+    test = await dao.user.test()
+    for item in test:
+        print(item)
 
     if message_text != callback.message.text:
 

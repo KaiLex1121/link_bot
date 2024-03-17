@@ -18,6 +18,7 @@ convention = {
     "fk": "fk__%(table_name)s__%(column_0_name)s__%(referred_table_name)s",
     "pk": "pk__%(table_name)s",
 }
+
 meta = MetaData(naming_convention=convention)
 
 
@@ -28,8 +29,10 @@ class Base(DeclarativeBase):
 
 
 def create_pool(db_config: DbConfig) -> async_sessionmaker[AsyncSession]:
+    engine = create_async_engine(
+        url=make_url(db_config.create_uri()),
+    )
 
-    engine = create_async_engine(url=make_url(db_config.create_uri()))
     pool: async_sessionmaker[AsyncSession] = async_sessionmaker(
         bind=engine,
         class_=AsyncSession,
