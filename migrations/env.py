@@ -1,4 +1,7 @@
 import asyncio
+import os
+import dotenv
+
 from logging.config import fileConfig
 
 from sqlalchemy import pool
@@ -10,6 +13,14 @@ from app.models.database.base import Base
 from app.models.database.user import User
 from app.models.database.chat import Chat
 
+
+# Load and read DB environments
+dotenv.load_dotenv()
+db_user = os.getenv('POSTGRES_USER')
+db_pass = os.getenv('POSTGRES_PASSWORD')
+db_host = os.getenv('DB_HOST')
+db_port = os.getenv('DB_PORT')
+db_db = os.getenv('POSTGRES_DB')
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.

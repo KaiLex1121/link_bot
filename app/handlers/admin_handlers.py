@@ -79,9 +79,6 @@ async def get_all_users(callback: CallbackQuery, dao: HolderDAO):
     users_count = await dao.user.count()
     message_text = f"Всего пользователей: {users_count}"
 
-    for item in test:
-        print(item)
-
     if message_text != callback.message.text:
 
         await callback.message.edit_text(
