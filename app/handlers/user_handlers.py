@@ -85,7 +85,7 @@ async def get_guide(message: Message):
 @router.message(Text(text="Связаться с админом"))
 async def message_to_admin(message: Message):
     await message.answer(
-        text="Держи: https://t.me/BlackTheo",
+        text="Держи: https://t.me/TheoAndFun",
         reply_markup=UserKeyboards.help_keyboard,
         disable_web_page_preview=True,
     )
