@@ -62,7 +62,17 @@ async def get_main_channel_link(message: Message, redis: Redis):
 @router.message(Text(text="18+ | Porn"))
 async def get_second_channel_link(message: Message, redis: Redis):
     await message.answer(
-        text=(await redis.get("second_link")).decode("utf-8"),
+        text=(await redis.get("porn_link")).decode("utf-8"),
+        reply_markup=UserKeyboards.channel_chosing_keyboard,
+        disable_web_page_preview=True,
+    )
+
+
+
+@router.message(Text(text="Animal gore (animal vs animal)"))
+async def get_animal_gore_channel_link(message: Message, redis: Redis):
+    await message.answer(
+        text=(await redis.get("animal_link")).decode("utf-8"),
         reply_markup=UserKeyboards.channel_chosing_keyboard,
         disable_web_page_preview=True,
     )
@@ -71,14 +81,16 @@ async def get_second_channel_link(message: Message, redis: Redis):
 @router.message(Text(text="Помощь | Help"))
 async def get_help(message: Message):
     await message.answer(
-        text="Какая помощь тебе нужна?", reply_markup=UserKeyboards.help_keyboard
+        text="Какая помощь тебе нужна?",
+        reply_markup=UserKeyboards.help_keyboard
     )
 
 
 @router.message(Text(text="Как зайти на порно канал"))
 async def get_guide(message: Message):
     await message.answer(
-        text=UserMessages.help_message, reply_markup=UserKeyboards.help_keyboard
+        text=UserMessages.help_message,
+        reply_markup=UserKeyboards.help_keyboard
     )
 
 

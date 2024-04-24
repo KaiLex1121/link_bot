@@ -32,7 +32,6 @@ def setup_middlewares(
 
 
 def get_storage(config: Config) -> Union[MemoryStorage, RedisStorage]:
-
     if config.tg_bot.use_redis:
         storage = RedisStorage.from_url(
             url=config.redis.dsn(),
@@ -40,27 +39,24 @@ def get_storage(config: Config) -> Union[MemoryStorage, RedisStorage]:
         )
     else:
         storage = MemoryStorage()
-
     return storage
 
 
-logger = logging.getLogger(__name__)
-log_level = logging.INFO
+logging.basicConfig(
+    level=logging.WARNING,
+    format="%(filename)s: %(lineno)d #%(levelname)-8s [%(asctime)s] - %(name)s - %(message)s",
+)
 
 
 async def main() -> None:
-
-    logging.basicConfig(
-        level=logging.INFO,
-        format="%(filename)s:%(lineno)d #%(levelname)-8s [%(asctime)s] - %(name)s - %(message)s",
-    )
-    logger.info("Bot has started")
+    logger = logging.getLogger(__name__)
+    logger.level = logging.INFO
+    logger.info("Bot has been started")
 
     config = load_config(None)
     storage = get_storage(config=config)
     bot = Bot(config.tg_bot.token)
     dp = Dispatcher(storage=storage)
-
     dp.include_router(user_handlers.router)
     dp.include_router(admin_handlers.router)
     setup_middlewares(dp, create_pool(config.db), config, storage.redis)

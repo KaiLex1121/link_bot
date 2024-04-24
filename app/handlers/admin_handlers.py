@@ -243,15 +243,17 @@ async def admin_command_handler(message: Message):
 async def get_links(callback: CallbackQuery, redis: Redis):
 
     main = (await redis.get(name="main_link")).decode("utf-8")
-    second = (await redis.get(name="second_link")).decode("utf-8")
-    links_message = AdminMessages.get_links_message(main, second)
-
-    if callback.message.text.strip("\n") != links_message.strip("\n"):
+    porn = (await redis.get(name="porn_link")).decode("utf-8")
+    animal = (await redis.get(name="animal_link")).decode("utf-8")
+    links_message = AdminMessages.get_links_message(main, porn, animal)
+    try:
         await callback.message.edit_text(
             text=links_message,
             reply_markup=callback.message.reply_markup,
             disable_web_page_preview=True,
         )
+    except TelegramBadRequest:
+        pass
     await callback.answer()
 
 
@@ -285,17 +287,22 @@ async def get_back(callback: CallbackQuery):
 )
 @router.callback_query(
     StateFilter(default_state),
-    F.data == "second_link_button_pressed"
+    F.data == "porn_link_button_pressed"
+)
+@router.callback_query(
+    StateFilter(default_state),
+    F.data == "animal_link_button_pressed"
 )
 async def edit_main_link_process(callback: CallbackQuery, state: FSMContext):
-
-    CHANNEL = "Основной"
-    STATE = EditLinkState.FILL_MAIN_LINK
-
-    if callback.data == "second_link_button_pressed":
+    if callback.data == "main_link_button_pressed":
+        CHANNEL = "Основной"
+        STATE = EditLinkState.FILL_MAIN_LINK
+    elif callback.data == "porn_link_button_pressed":
         CHANNEL = "Порно"
         STATE = EditLinkState.FILL_SECOND_LINK
-
+    elif callback.data == "animal_link_button_pressed":
+        CHANNEL = "Animal gore"
+        STATE = EditLinkState.FILL_ANIMAL_LINK
     await callback.message.delete()
     await callback.message.answer(
         text=f"Пришли ссылку на {CHANNEL} канал",
@@ -314,12 +321,19 @@ async def edit_main_link_process(callback: CallbackQuery, state: FSMContext):
     F.content_type == ContentType.TEXT,
     common_filters.IsLink(),
 )
+@router.message(
+    StateFilter(EditLinkState.FILL_ANIMAL_LINK),
+    F.content_type == ContentType.TEXT,
+    common_filters.IsLink(),
+)
 async def fill_link_process(message: Message, state: FSMContext, redis: Redis):
-    if await state.get_state() == EditLinkState.FILL_MAIN_LINK:
+    current_state = await state.get_state()
+    if current_state == EditLinkState.FILL_MAIN_LINK:
         await redis.set(name="main_link", value=message.text)
-    else:
-        await redis.set(name="second_link", value=message.text)
-
+    elif current_state == EditLinkState.FILL_SECOND_LINK:
+        await redis.set(name="porn_link", value=message.text)
+    elif current_state == EditLinkState.FILL_ANIMAL_LINK:
+        await redis.set(name="animal_link", value=message.text)
     await message.answer(
         text=f"Ссылка изменена на «{message.text}»",
         reply_markup=AdminKeyboards.start_keyboard,
@@ -339,17 +353,20 @@ async def fill_link_process(message: Message, state: FSMContext, redis: Redis):
     Text(text="Отменить редактирование"),
 )
 @router.message(
+    StateFilter(EditLinkState.FILL_ANIMAL_LINK),
+    F.content_type == ContentType.TEXT,
+    Text(text="Отменить редактирование"),
+)
+@router.message(
     StateFilter(MakeBroadcastState.MESSAGE_TEXT_WRITING),
     F.content_type == ContentType.TEXT,
     Text(text="Отменить редактирование")
 )
-async def cancel_link_editing(message: Message, bot: Bot, state: FSMContext):
-
+async def cancel_link_editing(message: Message, state: FSMContext):
     await message.answer(
         text="Редактирование отменено",
         reply_markup=AdminKeyboards.start_keyboard
     )
-
     await state.clear()
 
 
@@ -361,7 +378,11 @@ async def cancel_link_editing(message: Message, bot: Bot, state: FSMContext):
     StateFilter(EditLinkState.FILL_SECOND_LINK),
     F.content_type == ContentType.TEXT
 )
-async def warning_not_link(message: Message, state: FSMContext):
+@router.message(
+    StateFilter(EditLinkState.FILL_ANIMAL_LINK),
+    F.content_type == ContentType.TEXT
+)
+async def warning_not_link(message: Message):
     await message.answer(
         text="Ты прислал не ссылку!",
         reply_markup=AdminKeyboards.cancel_editing_keyboard,

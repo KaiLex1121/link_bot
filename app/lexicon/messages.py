@@ -20,9 +20,16 @@ class UserMessages:
 
 class AdminMessages:
 
-    def get_links_message(first_link, second_link):
-        message = f""" Ссылка на основной канал: {first_link}
+    def get_links_message(
+        main_link: str,
+        porn_link: str,
+        animal_link: str
+    ) -> str:
+        message = f"""
+Ссылка на основной канал: {main_link}
 
-Ссылка на порно канал: {second_link} """
+Ссылка на порно канал: {porn_link}
+
+Ссылка на animal gore канал: {animal_link}"""
 
         return message
